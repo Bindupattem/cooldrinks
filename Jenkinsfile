@@ -1,34 +1,39 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "bindusravya/cooldrinks-java"
-    }
-
     stages {
 
         stage('Checkout Code') {
             steps {
-                git :main'https://github.com/Bindupattem/cooldrinks.git'
+                git 'https://github.com/Bindupattem/cooldrinks.git'
             }
         }
 
         stage('Compile Java') {
             steps {
-                sh 'javac src/CoolDrinksMenu.java'
+                sh 'javac App.java'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME} ."
+                sh 'docker build -t cooldrinks:latest .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push ${IMAGE_NAME}"
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhubcred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh 'docker login -u $USER -p $PASS'
+                    sh 'docker tag cooldrinks:latest $USER/cooldrinks:latest'
+                    sh 'docker push $USER/cooldrinks:latest'
+                }
             }
         }
+
     }
 }
