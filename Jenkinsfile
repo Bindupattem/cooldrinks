@@ -2,19 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "bindusravya/cooldrinks-java"
+        IMAGE_NAME = "yourdockerhubusername/cooldrinks-java"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                checkout scm
-                https://github.com/Bindupattem/cooldrinks.git
+                git 'https://github.com/yourusername/java-jenkins-docker-project.git'
             }
         }
 
-        stage('Build Java') {
+        stage('Compile Java') {
             steps {
                 sh 'javac src/CoolDrinksMenu.java'
             }
@@ -22,13 +21,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
 
-        stage('Push Image') {
+        stage('Push Docker Image') {
             steps {
-                echo "Push step here"
+                sh "docker push ${IMAGE_NAME}"
             }
         }
     }
