@@ -9,7 +9,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/yourusername/java-jenkins-docker-project.git'
+                git branch 'main',https://github.com/Bindupattem/cooldrinks.git'
             }
         }
 
