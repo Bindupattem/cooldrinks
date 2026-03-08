@@ -2,18 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "yourdockerhubusername/cooldrinks-java"
+        DOCKER_IMAGE = "bindusravya/cooldrinks-java"
     }
 
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch 'main',https://github.com/Bindupattem/cooldrinks.git'
+                checkout scm
             }
         }
 
-        stage('Build Java Program') {
+        stage('Build Java') {
             steps {
                 sh 'javac src/CoolDrinksMenu.java'
             }
@@ -21,25 +21,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Push Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Image to DockerHub') {
-            steps {
-                sh 'docker push $DOCKER_IMAGE'
+                echo "Push step here"
             }
         }
     }
