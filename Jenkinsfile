@@ -10,6 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                https://github.com/Bindupattem/cooldrinks.git
             }
         }
 
