@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "yourdockerhubusername/cooldrinks-java"
+        IMAGE_NAME = "bindusravya/cooldrinks-java"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/yourusername/java-jenkins-docker-project.git'
+                git :main'https://github.com/Bindupattem/cooldrinks.git'
             }
         }
 
