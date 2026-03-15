@@ -17,7 +17,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "Cloning CoolDrink project from Git"
-                git branch: 'main', url: 'https://github.com/yourrepo/cooldrink.git'
+                git branch: 'main', url: 'https://github.com/Bindupattem/cooldrinks.git'
             }
         }
 
