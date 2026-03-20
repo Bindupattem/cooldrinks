@@ -38,7 +38,7 @@ pipeline {
         stage('Package') {
             steps {
                 echo "Packaging application"
-                sh 'mvn package'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
@@ -52,12 +52,16 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 echo "Pushing image to Docker Hub"
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh """
-                    echo $PASS | docker login -u $USER --password-stdin
-                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} $USER/${DOCKER_IMAGE}:${DOCKER_TAG}
-                    docker push $USER/${DOCKER_IMAGE}:${DOCKER_TAG}
-                    """
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} $DOCKER_USER/${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker push $DOCKER_USER/${DOCKER_IMAGE}:${DOCKER_TAG}
+                    '''
                 }
             }
         }
@@ -65,21 +69,21 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying CoolDrink application"
-                sh """
-                docker stop cooldrink-container || true
-                docker rm cooldrink-container || true
-                docker run -d -p 8080:8080 --name cooldrink-container $DOCKER_IMAGE:$DOCKER_TAG
-                """
+                sh '''
+                    docker stop cooldrink-container || true
+                    docker rm cooldrink-container || true
+                    docker run -d -p 8080:8080 --name cooldrink-container ${DOCKER_IMAGE}:${DOCKER_TAG}
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "CoolDrink pipeline executed successfully 🎉"
+            echo "CoolDrink pipeline executed successfully"
         }
         failure {
-            echo "Pipeline failed ❌"
+            echo "Pipeline failed"
         }
     }
 }
